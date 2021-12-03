@@ -32,6 +32,8 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Hey its Ben", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
