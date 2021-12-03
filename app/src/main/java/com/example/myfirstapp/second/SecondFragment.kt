@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.myfirstapp.databinding.FragmentSecondBinding
@@ -23,40 +24,26 @@ class SecondFragment : Fragment() {
 
     private var _binding: FragmentSecondBinding? = null
     private val binding get() = _binding!!
+    private lateinit var secondViewModel: SecondViewModel
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-
         _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        secondViewModel = ViewModelProvider(this).get(SecondViewModel::class.java)
+        secondViewModel.getResponse().observe(viewLifecycleOwner, {
+            binding.textviewSecond.text = it
+        })
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonSecond.setOnClickListener {
-
-            viewLifecycleOwner.lifecycleScope.launch (Dispatchers.IO) {
-                val client = OkHttpClient()
-
-                val request = Request.Builder()
-                    .url("https://google-search3.p.rapidapi.com/api/v1/search/q=elon+musk&num=100")
-                    .get()
-                    .addHeader("x-user-agent", "desktop")
-                    .addHeader("x-proxy-location", "US")
-                    .addHeader("x-rapidapi-host", "google-search3.p.rapidapi.com")
-                    .addHeader("x-rapidapi-key", "7d46b461dfmsh6e22844b5beb80ep1789f9jsn05189fc8fe2a")
-                    .build()
-
-                val response = client.newCall(request).execute()
-
-                activity?.runOnUiThread {
-                    binding.textviewSecond.text = response.message
-                }
-            }
+            var searchTerm = binding.editTextSearch.text.toString()
+            secondViewModel.fetchGoogle(searchTerm)
         }
     }
 
