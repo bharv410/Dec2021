@@ -35,6 +35,10 @@ class FirstFragment : Fragment() {
         binding.buttonFirst.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
+
+        binding.buttonDiceroll.setOnClickListener{
+            findNavController().navigate(R.id.action_FirstFragment_to_DiceRollFragment);
+        }
     }
 
     override fun onDestroyView() {
