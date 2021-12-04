@@ -6,9 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.myfirstapp.api.repository.Repository
 import com.example.myfirstapp.databinding.FragmentSecondBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,15 +28,19 @@ class SecondFragment : Fragment() {
     private var _binding: FragmentSecondBinding? = null
     private val binding get() = _binding!!
     private lateinit var secondViewModel: SecondViewModel
+    private lateinit var viewModelFactory: SecondViewModelFactory
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentSecondBinding.inflate(inflater, container, false)
-        secondViewModel = ViewModelProvider(this).get(SecondViewModel::class.java)
-        secondViewModel.getResponse().observe(viewLifecycleOwner, {
-            binding.textviewSecond.text = it
+        viewModelFactory = SecondViewModelFactory(Repository())
+        secondViewModel = ViewModelProvider(this, viewModelFactory).get(SecondViewModel::class.java)
+
+        secondViewModel.response.observe(viewLifecycleOwner, {
+            if(it != null)
+                binding.textviewSecond.text = it.device_type + it.total + it.results[0].title
         })
         return binding.root
     }
@@ -42,8 +49,8 @@ class SecondFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonSecond.setOnClickListener {
-            var searchTerm = binding.editTextSearch.text.toString()
-            secondViewModel.fetchGoogle(searchTerm)
+            val searchTerm = binding.editTextSearch.text.toString()
+            secondViewModel.fetchGoogle()
         }
     }
 
